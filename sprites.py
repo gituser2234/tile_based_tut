@@ -7,15 +7,24 @@ class Player(pygame.sprite.Sprite):
         self.groups = game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
+        
+        # Prepare our player
         self.image = pygame.Surface([TILESIZE, TILESIZE])
         self.image.fill(settings.YELLOW)
         self.rect = self.image.get_rect()
+        
+        # Vectors
         self.vx, self.vy = 0, 0
+        
+        # Positions
         self.x = x * TILESIZE
         self.y = y * TILESIZE
         
     def get_keys(self):
+        # Reset vectors to zero
         self.vx, self.vy = 0, 0
+        
+        # Check pressed keys
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             self.vx = -PLAYER_SPEED
@@ -25,6 +34,7 @@ class Player(pygame.sprite.Sprite):
             self.vy = -PLAYER_SPEED
         if keys[pygame.K_DOWN]:
             self.vy = PLAYER_SPEED
+            
         # if running diagonal to avoid speed-up
         if self.vx != 0 and self.vy != 0:
             self.vx *= 0.7071
@@ -59,12 +69,11 @@ class Player(pygame.sprite.Sprite):
         self.get_keys()
         self.x += self.vx * self.game.dt
         self.y += self.vy * self.game.dt
+        
         self.rect.x = self.x
         self.collide_with_walls('x')
         self.rect.y = self.y
         self.collide_with_walls('y')
-        
-        # Check if colliding with anythin')
         
 
 class Wall(pygame.sprite.Sprite):

@@ -11,16 +11,27 @@ from os import path
 
 class Game:
     def __init__(self):
+        # Initialize pygame
         pygame.init()
+        
+        # Set screen settings
         self.screen = pygame.display.set_mode([WIDTH, HEIGHT])
         pygame.display.set_caption(TITLE)
+        
+        # Set clock to limit FPS
         self.clock = pygame.time.Clock()
+        
         # pygame.key.set_repeat(when, inteval)
         pygame.key.set_repeat(500, 100)
+        
+        # Load data
         self.load_data()
 
     def load_data(self):
+        # Specify game folder
         game_folder = path.dirname(__file__)
+        
+        # Load data from map
         self.map_data = []
         with open(path.join(game_folder, 'map.txt'), 'rt') as f:
             for line in f:
@@ -48,6 +59,7 @@ class Game:
     def run(self):
         # game loop - set self.playing = False to end the game
         self.playing = True
+        
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
             self.events()
