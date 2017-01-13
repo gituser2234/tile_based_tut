@@ -1,6 +1,6 @@
 import pygame
 import settings
-from settings import TILESIZE, PLAYER_SPEED, PLAYER_ROT_SPEED, PLAYER_HIT_RECT
+from settings import TILESIZE, PLAYER_SPEED, PLAYER_ROT_SPEED, PLAYER_HIT_RECT, MOB_IMG
 from tilemap import collide_hit_rect
 vec = pygame.math.Vector2
 
@@ -86,15 +86,23 @@ class Player(pygame.sprite.Sprite):
         self.collide_with_walls('y')
         self.rect.center = self.hit_rect.center
         
-
+class Mob(pygame.sprite.Sprite):
+    def __init__(self, game, x, y):
+        # Member of all_sprites groups and walls groups
+        self.groups = game.all_sprites, game.mobs
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.image = game.mob_img
+        self.rect = self.image.get_rect()
+        self.pos = vec(x, y) * TILESIZE
+        self.rect.center = self.pos
+        
 class Wall(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
         # Member of all_sprites groups and walls groups
         self.groups = game.all_sprites, game.walls
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = pygame.Surface([TILESIZE, TILESIZE])
-        self.image.fill(settings.GREEN)
+        self.image = game.wall_img
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y

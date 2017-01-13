@@ -5,8 +5,8 @@
 import pygame
 import sys
 import settings
-from settings import WIDTH, HEIGHT, TITLE, TILESIZE, FPS, PLAYER_IMG
-from sprites import Player, Wall
+from settings import WIDTH, HEIGHT, TITLE, TILESIZE, FPS, PLAYER_IMG, WALL_IMG, MOB_IMG
+from sprites import Player, Wall, Mob
 from os import path
 from tilemap import Map, Camera
 
@@ -35,15 +35,20 @@ class Game:
         
         # Load data from map
         self.map_data = []
-        self.map = Map(path.join(game_folder, 'map4.txt'))
+        self.map = Map(path.join(game_folder, 'map3.txt'))
         
-        # Load player data
+        # Load img data
         self.player_img = pygame.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
+        self.mob_img = pygame.image.load(path.join(img_folder, MOB_IMG)).convert_alpha()
+        self.wall_img = pygame.image.load(path.join(img_folder, WALL_IMG)).convert_alpha()
+        # Scale wall img due to its huge dimensions
+        self.wall_img = pygame.transform.scale(self.wall_img, (TILESIZE, TILESIZE))
 
     def new(self):
         # initialize all variables and do all the setup for a new game
         self.all_sprites = pygame.sprite.Group()
         self.walls = pygame.sprite.Group()
+        self.mobs = pygame.sprite.Group()
         
         # Spawning walls
         # enumerate makes row as index, example:
@@ -57,6 +62,8 @@ class Game:
                 elif tile == 'P':
                     # Spawn player
                     self.player = Player(self, col, row)
+                elif tile == 'M':
+                    Mob(self, col, row)
                     
         self.camera = Camera(self.map.width, self.map.height)
                     
@@ -87,8 +94,10 @@ class Game:
             pygame.draw.line(self.screen, settings.LIGHTGREY, (0, y), (WIDTH, y))
 
     def draw(self):
+        # Display FPS
+        pygame.display.set_caption("{:.2f}".format(self.clock.get_fps()))
         self.screen.fill(settings.BGCOLOR)
-        self.draw_grid()
+        #self.draw_grid()
         for sprite in self.all_sprites:
             #self.screen.blit(sprite.image, sprite.rect)
             self.screen.blit(sprite.image, self.camera.apply(sprite))
