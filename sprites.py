@@ -91,10 +91,20 @@ class Mob(pygame.sprite.Sprite):
         # Member of all_sprites groups and walls groups
         self.groups = game.all_sprites, game.mobs
         pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
         self.image = game.mob_img
         self.rect = self.image.get_rect()
         self.pos = vec(x, y) * TILESIZE
         self.rect.center = self.pos
+        self.rot = 0
+        
+    def update(self):
+        # We calculate angle from mob to player's vectors
+        self.rot = (self.game.player.pos - self.pos).angle_to(vec(1, 0))
+        self.image = pygame.transform.rotate(self.game.mob_img, self.rot)
+        self.rect = self.image.get_rect()
+        self.rect.center = self.pos
+        
         
 class Wall(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
