@@ -1,4 +1,4 @@
-
+import pygame
 
 # define some colors (R, G, B)
 WHITE = (255, 255, 255)
@@ -22,4 +22,7 @@ GRIDHEIGHT = HEIGHT / TILESIZE
 
 # Player settings
 PLAYER_SPEED = 300
+# degree - 360 means 1 sec to full angle, 160 - 1/2
+PLAYER_ROT_SPEED = 250
 PLAYER_IMG = 'manBlue_gun.png'
+PLAYER_HIT_RECT = pygame.Rect(0, 0, 35, 35)

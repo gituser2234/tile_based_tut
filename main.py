@@ -92,6 +92,8 @@ class Game:
         for sprite in self.all_sprites:
             #self.screen.blit(sprite.image, sprite.rect)
             self.screen.blit(sprite.image, self.camera.apply(sprite))
+        #used to draw rect showing additional helpful info
+        #pygame.draw.rect(self.screen, settings.WHITE, self.player.hit_rect, 2)
         pygame.display.flip()
 
     def events(self):

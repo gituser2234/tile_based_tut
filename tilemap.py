@@ -8,6 +8,9 @@ Created on Thu Jan 12 23:56:54 2017
 import pygame
 from settings import TILESIZE, WIDTH, HEIGHT
 
+def collide_hit_rect(one, two):
+    return one.hit_rect.colliderect(two.rect)
+
 class Map():
     def __init__(self, filename):
         self.data = []
@@ -34,8 +37,8 @@ class Camera:
         
     def update(self, target):
         # We want centered on the screen
-        x = -target.rect.x + (WIDTH // 2)
-        y = -target.rect.y + (HEIGHT // 2)
+        x = -target.rect.centerx + (WIDTH // 2)
+        y = -target.rect.centery + (HEIGHT // 2)
         
         # Limit scrolling to map size
         x = min(0, x) # left
