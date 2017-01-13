@@ -33,3 +33,5 @@ PLAYER_HIT_RECT = pygame.Rect(0, 0, 35, 35)
 
 # MOB SETTINGS
 MOB_IMG = 'zoimbie1_hold.png'
+MOB_SPEED = 150
+MOB_HIT_RECT = pygame.Rect(0, 0, 30, 30)
