@@ -1,7 +1,8 @@
 import pygame
 from settings import TILESIZE, PLAYER_SPEED, PLAYER_ROT_SPEED, PLAYER_HIT_RECT, MOB_SPEED, MOB_HIT_RECT
-from settings import BULLET_SPEED, BULLET_LIFETIME, BULLET_RATE, BARREL_OFFSET
+from settings import BULLET_SPEED, BULLET_LIFETIME, BULLET_RATE, BARREL_OFFSET, KICKBACK, GUN_SPREAD
 from tilemap import collide_hit_rect
+from random import uniform
 vec = pygame.math.Vector2
 
 
@@ -76,6 +77,7 @@ class Player(pygame.sprite.Sprite):
                 # player's position + our's offset
                 pos = self.pos + BARREL_OFFSET.rotate(-self.rot)
                 Bullet(self.game, pos, direction)
+                self.vel = vec(-KICKBACK, 0).rotate(-self.rot)
             
 #        # if running diagonal to avoid speed-up
 #        if self.vel.x != 0 and self.vel.y != 0:
@@ -134,6 +136,7 @@ class Mob(pygame.sprite.Sprite):
         collide_with_walls(self, self.game.walls, 'y')
         self.rect.center = self.hit_rect.center
         
+        
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, game, pos, direction):
         self.groups = game.all_sprites, game.bullets
@@ -144,7 +147,8 @@ class Bullet(pygame.sprite.Sprite):
         # Copies vector to another to avoid usin' player's pos
         self.pos = vec(pos)
         self.rect.center = pos
-        self.vel = direction * BULLET_SPEED
+        spread = uniform(-GUN_SPREAD, GUN_SPREAD)
+        self.vel = direction.rotate(spread) * BULLET_SPEED
         self.spawn_time = pygame.time.get_ticks()
         
     def update(self):

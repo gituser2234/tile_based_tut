@@ -89,6 +89,11 @@ class Game:
         # update portion of the game loop
         self.all_sprites.update()
         self.camera.update(self.player)
+        
+        # Bullets hit mobs
+        hits = pygame.sprite.groupcollide(self.mobs, self.bullets, False, True)
+        for hit in hits:
+            hit.kill()
 
     def draw_grid(self):
         for x in range(0, WIDTH, TILESIZE):
