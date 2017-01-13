@@ -1,7 +1,6 @@
 import pygame
-import settings
-from settings import TILESIZE, PLAYER_SPEED, PLAYER_ROT_SPEED, PLAYER_HIT_RECT, MOB_IMG, MOB_SPEED, MOB_HIT_RECT
-from settings import BULLET_SPEED, BULLET_LIFETIME, BULLET_RATE
+from settings import TILESIZE, PLAYER_SPEED, PLAYER_ROT_SPEED, PLAYER_HIT_RECT, MOB_SPEED, MOB_HIT_RECT
+from settings import BULLET_SPEED, BULLET_LIFETIME, BULLET_RATE, BARREL_OFFSET
 from tilemap import collide_hit_rect
 vec = pygame.math.Vector2
 
@@ -74,7 +73,9 @@ class Player(pygame.sprite.Sprite):
             if now - self.last_shot > BULLET_RATE:
                 self.last_shot = now
                 direction = vec(1, 0).rotate(-self.rot)
-                Bullet(self.game, self.pos, direction)
+                # player's position + our's offset
+                pos = self.pos + BARREL_OFFSET.rotate(-self.rot)
+                Bullet(self.game, pos, direction)
             
 #        # if running diagonal to avoid speed-up
 #        if self.vel.x != 0 and self.vel.y != 0:

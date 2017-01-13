@@ -1,4 +1,5 @@
 import pygame
+vec = pygame.math.Vector2
 
 # define some colors (R, G, B)
 WHITE = (255, 255, 255)
@@ -30,6 +31,7 @@ PLAYER_SPEED = 300
 PLAYER_ROT_SPEED = 250
 PLAYER_IMG = 'manBlue_gun.png'
 PLAYER_HIT_RECT = pygame.Rect(0, 0, 35, 35)
+BARREL_OFFSET = vec(30, 10)
 
 # GUN SETTINGS
 BULLET_IMG = 'bullet.png'
