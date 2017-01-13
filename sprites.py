@@ -10,8 +10,7 @@ class Player(pygame.sprite.Sprite):
         self.game = game
         
         # Prepare our player
-        self.image = pygame.Surface([TILESIZE, TILESIZE])
-        self.image.fill(settings.YELLOW)
+        self.image = game.player_img
         self.rect = self.image.get_rect()
         
         # Vectors

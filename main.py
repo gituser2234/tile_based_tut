@@ -5,7 +5,7 @@
 import pygame
 import sys
 import settings
-from settings import WIDTH, HEIGHT, TITLE, TILESIZE, FPS
+from settings import WIDTH, HEIGHT, TITLE, TILESIZE, FPS, PLAYER_IMG
 from sprites import Player, Wall
 from os import path
 from tilemap import Map, Camera
@@ -31,10 +31,14 @@ class Game:
     def load_data(self):
         # Specify game folder
         game_folder = path.dirname(__file__)
+        img_folder = path.join(game_folder, 'img')
         
         # Load data from map
         self.map_data = []
         self.map = Map(path.join(game_folder, 'map4.txt'))
+        
+        # Load player data
+        self.player_img = pygame.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
 
     def new(self):
         # initialize all variables and do all the setup for a new game
