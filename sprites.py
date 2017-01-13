@@ -1,7 +1,7 @@
 import pygame
 from settings import TILESIZE, PLAYER_SPEED, PLAYER_ROT_SPEED, PLAYER_HIT_RECT, MOB_SPEED, MOB_HIT_RECT
 from settings import BULLET_SPEED, BULLET_LIFETIME, BULLET_RATE, BARREL_OFFSET, KICKBACK, GUN_SPREAD
-from settings import GREEN, YELLOW, RED
+from settings import GREEN, YELLOW, RED, MOB_HEALTH, PLAYER_HEALTH
 from tilemap import collide_hit_rect
 from random import uniform
 vec = pygame.math.Vector2
@@ -11,10 +11,11 @@ def collide_with_walls(sprite, group, direction):
         if direction == 'x':
             hits = pygame.sprite.spritecollide(sprite, group, False, collide_hit_rect)
             if hits:
-                if sprite.vel.x > 0:
+                # check if the walls' center is greater than player's center
+                if hits[0].rect.centerx > sprite.hit_rect.centerx:
                     # if movin' right        # dividin' by to due to center
                     sprite.pos.x = hits[0].rect.left - sprite.hit_rect.width / 2
-                elif sprite.vel.x < 0:
+                if hits[0].rect.centerx < sprite.hit_rect.centerx:
                     sprite.pos.x = hits[0].rect.right + sprite.hit_rect.width / 2
                 # if we hit, then we stop
                 sprite.vel.x = 0
@@ -23,10 +24,10 @@ def collide_with_walls(sprite, group, direction):
         if direction == 'y':
             hits = pygame.sprite.spritecollide(sprite, group, False, collide_hit_rect)
             if hits:
-                if sprite.vel.y > 0:
+                if hits[0].rect.centery > sprite.hit_rect.centery:
                     # if movin' right
                     sprite.pos.y = hits[0].rect.top - sprite.hit_rect.height / 2
-                elif sprite.vel.y < 0:
+                if hits[0].rect.centery < sprite.hit_rect.centery:
                     sprite.pos.y = hits[0].rect.bottom + sprite.hit_rect.height / 2
                 # if we hit, then we stop
                 sprite.vel.y = 0
@@ -54,6 +55,7 @@ class Player(pygame.sprite.Sprite):
         
         # Others
         self.last_shot = 0
+        self.health = PLAYER_HEALTH
         
     def get_keys(self):
         # Reset vectors to zero
@@ -119,7 +121,7 @@ class Mob(pygame.sprite.Sprite):
         self.acc = vec(0, 0)
         self.rect.center = self.pos
         self.rot = 0
-        self.health = 100
+        self.health = MOB_HEALTH
         
     def update(self):
         # We calculate angle from mob to player's vectors
@@ -149,10 +151,10 @@ class Mob(pygame.sprite.Sprite):
         else:
             col = RED
             
-        width = int(self.rect.width * self.health / 100)
+        width = int(self.rect.width * self.health / MOB_HEALTH)
         # Location accordin' to sprite img, not screen
         self.health_bar = pygame.Rect(0, 0, width, 7)
-        if self.health < 100:
+        if self.health < MOB_HEALTH:
             pygame.draw.rect(self.image, col, self.health_bar)
         
         

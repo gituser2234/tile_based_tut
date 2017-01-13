@@ -26,6 +26,7 @@ GRIDHEIGHT = HEIGHT / TILESIZE
 WALL_IMG = 'tileGreen_39.png'
 
 # Player settings
+PLAYER_HEALTH = 100
 PLAYER_SPEED = 300
 # degree - 360 means 1 sec to full angle, 160 - 1/2
 PLAYER_ROT_SPEED = 250
@@ -46,3 +47,6 @@ BULLET_DAMAGE = 10
 MOB_IMG = 'zoimbie1_hold.png'
 MOB_SPEED = 150
 MOB_HIT_RECT = pygame.Rect(0, 0, 30, 30)
+MOB_HEALTH = 100
+MOB_DAMAGE = 10
+MOB_KNOCKBACK = 20

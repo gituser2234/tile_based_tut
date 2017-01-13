@@ -5,9 +5,9 @@
 import pygame
 import sys
 import settings
-from settings import WIDTH, HEIGHT, TITLE, TILESIZE, FPS, PLAYER_IMG, WALL_IMG, MOB_IMG
-from settings import BULLET_IMG, BULLET_DAMAGE
-from sprites import Player, Wall, Mob
+from settings import WIDTH, HEIGHT, TITLE, TILESIZE, FPS, PLAYER_IMG, WALL_IMG, MOB_IMG,\
+BULLET_IMG, BULLET_DAMAGE, MOB_DAMAGE, MOB_KNOCKBACK
+from sprites import Player, Wall, Mob, collide_hit_rect
 from os import path
 from tilemap import Map, Camera
 vec = pygame.math.Vector2
@@ -91,6 +91,16 @@ class Game:
         self.all_sprites.update()
         self.camera.update(self.player)
         
+        # Mobs hits playa'
+        hits = pygame.sprite.spritecollide(self.player, self.mobs, False, collide_hit_rect)
+        for hit in hits:
+            self.player.health -= MOB_DAMAGE
+            hit.vel = vec(0, 0)
+            if self.player.health <= 0:
+                self.playing = False
+        if hits:
+            # Rotate whatever mob hit us
+            self.player.pos += vec(MOB_KNOCKBACK, 0).rotate(-hits[0].rot)
         # Bullets hit mobs
         hits = pygame.sprite.groupcollide(self.mobs, self.bullets, False, True)
         for hit in hits:
