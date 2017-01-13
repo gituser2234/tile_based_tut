@@ -6,10 +6,11 @@ import pygame
 import sys
 import settings
 from settings import WIDTH, HEIGHT, TITLE, TILESIZE, FPS, PLAYER_IMG, WALL_IMG, MOB_IMG
-from settings import BULLET_IMG
+from settings import BULLET_IMG, BULLET_DAMAGE
 from sprites import Player, Wall, Mob
 from os import path
 from tilemap import Map, Camera
+vec = pygame.math.Vector2
 
 class Game:
     def __init__(self):
@@ -93,7 +94,9 @@ class Game:
         # Bullets hit mobs
         hits = pygame.sprite.groupcollide(self.mobs, self.bullets, False, True)
         for hit in hits:
-            hit.kill()
+            hit.health -= BULLET_DAMAGE
+            # When we hit, we stop it
+            hit.vel = vec(0, 0)
 
     def draw_grid(self):
         for x in range(0, WIDTH, TILESIZE):

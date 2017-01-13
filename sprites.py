@@ -118,6 +118,7 @@ class Mob(pygame.sprite.Sprite):
         self.acc = vec(0, 0)
         self.rect.center = self.pos
         self.rot = 0
+        self.health = 100
         
     def update(self):
         # We calculate angle from mob to player's vectors
@@ -135,6 +136,9 @@ class Mob(pygame.sprite.Sprite):
         self.hit_rect.centery = self.pos.y
         collide_with_walls(self, self.game.walls, 'y')
         self.rect.center = self.hit_rect.center
+        
+        if self.health <= 0:
+            self.kill()
         
         
 class Bullet(pygame.sprite.Sprite):
