@@ -1,6 +1,7 @@
 import pygame
 from settings import TILESIZE, PLAYER_SPEED, PLAYER_ROT_SPEED, PLAYER_HIT_RECT, MOB_SPEED, MOB_HIT_RECT
 from settings import BULLET_SPEED, BULLET_LIFETIME, BULLET_RATE, BARREL_OFFSET, KICKBACK, GUN_SPREAD
+from settings import GREEN, YELLOW, RED
 from tilemap import collide_hit_rect
 from random import uniform
 vec = pygame.math.Vector2
@@ -139,6 +140,20 @@ class Mob(pygame.sprite.Sprite):
         
         if self.health <= 0:
             self.kill()
+    
+    def draw_health(self):
+        if self.health > 60:
+            col = GREEN
+        elif self.health > 30:
+            col = YELLOW
+        else:
+            col = RED
+            
+        width = int(self.rect.width * self.health / 100)
+        # Location accordin' to sprite img, not screen
+        self.health_bar = pygame.Rect(0, 0, width, 7)
+        if self.health < 100:
+            pygame.draw.rect(self.image, col, self.health_bar)
         
         
 class Bullet(pygame.sprite.Sprite):

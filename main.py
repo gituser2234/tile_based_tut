@@ -110,6 +110,9 @@ class Game:
         self.screen.fill(settings.BGCOLOR)
         #self.draw_grid()
         for sprite in self.all_sprites:
+            # If it is a Mob, then draw its health
+            if isinstance(sprite, Mob):
+                sprite.draw_health()
             #self.screen.blit(sprite.image, sprite.rect)
             self.screen.blit(sprite.image, self.camera.apply(sprite))
         #used to draw rect showing additional helpful info
