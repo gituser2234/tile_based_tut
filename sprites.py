@@ -1,6 +1,7 @@
 import pygame
 import settings
 from settings import TILESIZE, PLAYER_SPEED, PLAYER_ROT_SPEED, PLAYER_HIT_RECT, MOB_IMG, MOB_SPEED, MOB_HIT_RECT
+from settings import BULLET_SPEED, BULLET_LIFETIME, BULLET_RATE
 from tilemap import collide_hit_rect
 vec = pygame.math.Vector2
 
@@ -50,6 +51,9 @@ class Player(pygame.sprite.Sprite):
         # Rotation
         self.rot = 0
         
+        # Others
+        self.last_shot = 0
+        
     def get_keys(self):
         # Reset vectors to zero
         self.vel = vec(0, 0)
@@ -65,6 +69,12 @@ class Player(pygame.sprite.Sprite):
             self.vel = vec(PLAYER_SPEED, 0).rotate(-self.rot)
         if keys[pygame.K_DOWN]:
             self.vel = vec(-PLAYER_SPEED / 2, 0).rotate(-self.rot)
+        if keys[pygame.K_SPACE]:
+            now = pygame.time.get_ticks()
+            if now - self.last_shot > BULLET_RATE:
+                self.last_shot = now
+                direction = vec(1, 0).rotate(-self.rot)
+                Bullet(self.game, self.pos, direction)
             
 #        # if running diagonal to avoid speed-up
 #        if self.vel.x != 0 and self.vel.y != 0:
@@ -122,6 +132,28 @@ class Mob(pygame.sprite.Sprite):
         self.hit_rect.centery = self.pos.y
         collide_with_walls(self, self.game.walls, 'y')
         self.rect.center = self.hit_rect.center
+        
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self, game, pos, direction):
+        self.groups = game.all_sprites, game.bullets
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = game.bullet_img
+        self.rect = self.image.get_rect()
+        # Copies vector to another to avoid usin' player's pos
+        self.pos = vec(pos)
+        self.rect.center = pos
+        self.vel = direction * BULLET_SPEED
+        self.spawn_time = pygame.time.get_ticks()
+        
+    def update(self):
+        self.pos += self.vel * self.game.dt
+        self.rect.center = self.pos
+        if pygame.sprite.spritecollideany(self, self.game.walls):
+            self.kill()
+        if pygame.time.get_ticks() - self.spawn_time > BULLET_LIFETIME:
+            self.kill()
+            
         
         
 class Wall(pygame.sprite.Sprite):

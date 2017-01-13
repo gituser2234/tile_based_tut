@@ -6,6 +6,7 @@ import pygame
 import sys
 import settings
 from settings import WIDTH, HEIGHT, TITLE, TILESIZE, FPS, PLAYER_IMG, WALL_IMG, MOB_IMG
+from settings import BULLET_IMG
 from sprites import Player, Wall, Mob
 from os import path
 from tilemap import Map, Camera
@@ -39,6 +40,7 @@ class Game:
         
         # Load img data
         self.player_img = pygame.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
+        self.bullet_img = pygame.image.load(path.join(img_folder, BULLET_IMG)).convert_alpha()
         self.mob_img = pygame.image.load(path.join(img_folder, MOB_IMG)).convert_alpha()
         self.wall_img = pygame.image.load(path.join(img_folder, WALL_IMG)).convert_alpha()
         # Scale wall img due to its huge dimensions
@@ -49,6 +51,7 @@ class Game:
         self.all_sprites = pygame.sprite.Group()
         self.walls = pygame.sprite.Group()
         self.mobs = pygame.sprite.Group()
+        self.bullets = pygame.sprite.Group()
         
         # Spawning walls
         # enumerate makes row as index, example:
