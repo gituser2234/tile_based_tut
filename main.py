@@ -5,12 +5,31 @@
 import pygame
 import sys
 import settings
-from settings import WIDTH, HEIGHT, TITLE, TILESIZE, FPS, PLAYER_IMG, WALL_IMG, MOB_IMG,\
-BULLET_IMG, BULLET_DAMAGE, MOB_DAMAGE, MOB_KNOCKBACK
+from settings import WIDTH, HEIGHT, TITLE, TILESIZE, FPS, PLAYER_IMG, WALL_IMG,\
+MOB_IMG, BULLET_IMG, BULLET_DAMAGE, MOB_DAMAGE, MOB_KNOCKBACK, GREEN, YELLOW,\
+RED, WHITE, PLAYER_HEALTH
 from sprites import Player, Wall, Mob, collide_hit_rect
 from os import path
 from tilemap import Map, Camera
 vec = pygame.math.Vector2
+
+# HUD FUNCTION
+def draw_player_health(surf, x, y, pct):
+    if pct < 0:
+        pct = 0
+    BAR_LENGTH = 100
+    BAR_HEIGHT = 20
+    fill = pct * BAR_LENGTH
+    outline_rect = pygame.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
+    fill_rect = pygame.Rect(x, y, fill, BAR_HEIGHT)
+    if pct > 0.6:
+        col = GREEN
+    elif pct > 0.3:
+        col = YELLOW
+    else:
+        col = RED
+    pygame.draw.rect(surf, col, fill_rect)
+    pygame.draw.rect(surf, WHITE, outline_rect, 2)
 
 class Game:
     def __init__(self):
@@ -127,6 +146,10 @@ class Game:
             self.screen.blit(sprite.image, self.camera.apply(sprite))
         #used to draw rect showing additional helpful info
         #pygame.draw.rect(self.screen, settings.WHITE, self.player.hit_rect, 2)
+        
+        # HUD functions
+        draw_player_health(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
+        
         pygame.display.flip()
 
     def events(self):
