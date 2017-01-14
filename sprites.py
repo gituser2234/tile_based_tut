@@ -1,9 +1,9 @@
 import pygame
-from settings import TILESIZE, PLAYER_SPEED, PLAYER_ROT_SPEED, PLAYER_HIT_RECT, MOB_SPEED, MOB_HIT_RECT
-from settings import BULLET_SPEED, BULLET_LIFETIME, BULLET_RATE, BARREL_OFFSET, KICKBACK, GUN_SPREAD
-from settings import GREEN, YELLOW, RED, MOB_HEALTH, PLAYER_HEALTH
+from settings import TILESIZE, PLAYER_SPEED, PLAYER_ROT_SPEED, PLAYER_HIT_RECT,\
+MOB_SPEEDS, MOB_HIT_RECT, BULLET_SPEED, BULLET_LIFETIME, BULLET_RATE, BARREL_OFFSET,\
+KICKBACK, GUN_SPREAD, GREEN, YELLOW, RED, MOB_HEALTH, PLAYER_HEALTH, AVOID_RADIUS
 from tilemap import collide_hit_rect
-from random import uniform
+from random import uniform, choice
 vec = pygame.math.Vector2
 
 
@@ -122,14 +122,25 @@ class Mob(pygame.sprite.Sprite):
         self.rect.center = self.pos
         self.rot = 0
         self.health = MOB_HEALTH
+        self.speed = choice(MOB_SPEEDS)
+        
+    def avoid_mobs(self):
+        for mob in self.game.mobs:
+            if mob != self:
+                dist = self.pos - mob.pos
+                if 0 < dist.length() < AVOID_RADIUS:
+                    # Vectors addin' (look: math vectors addin' (like in school))
+                    self.acc += dist.normalize()
         
     def update(self):
         # We calculate angle from mob to player's vectors
         self.rot = (self.game.player.pos - self.pos).angle_to(vec(1, 0))
         self.image = pygame.transform.rotate(self.game.mob_img, self.rot)
-        self.rect = self.image.get_rect()
+        #self.rect = self.image.get_rect()
         self.rect.center = self.pos
-        self.acc = vec(MOB_SPEED, 0).rotate(-self.rot)
+        self.acc = vec(1, 0).rotate(-self.rot)
+        self.avoid_mobs()
+        self.acc.scale_to_length(self.speed)
         # Now he has maximum speed
         self.acc += self.vel * -1
         self.vel += self.acc * self.game.dt
