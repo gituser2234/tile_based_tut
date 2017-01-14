@@ -43,6 +43,8 @@ class Player(pygame.sprite.Sprite):
         # Prepare our player
         self.image = game.player_img
         self.rect = self.image.get_rect()
+        # BUGFIX: @part15
+        self.rect.center = (x, y)
         self.hit_rect = PLAYER_HIT_RECT
         self.hit_rect.center = self.rect.center
         

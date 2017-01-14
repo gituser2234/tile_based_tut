@@ -8,7 +8,7 @@ import settings
 from settings import WIDTH, HEIGHT, TITLE, TILESIZE, FPS, PLAYER_IMG, WALL_IMG,\
 MOB_IMG, BULLET_IMG, BULLET_DAMAGE, MOB_DAMAGE, MOB_KNOCKBACK, GREEN, YELLOW,\
 RED, WHITE, PLAYER_HEALTH, CYAN
-from sprites import Player, Wall, Mob, collide_hit_rect, Obstacle
+from sprites import Player, Mob, collide_hit_rect, Obstacle
 from os import path
 from tilemap import Camera, TiledMap
 vec = pygame.math.Vector2
