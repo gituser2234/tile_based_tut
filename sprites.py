@@ -48,7 +48,7 @@ class Player(pygame.sprite.Sprite):
         
         # Vectors
         self.vel = vec(0, 0)
-        self.pos = vec(x, y) * TILESIZE
+        self.pos = vec(x, y)
         
         # Rotation
         self.rot = 0
@@ -116,7 +116,7 @@ class Mob(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.hit_rect = MOB_HIT_RECT.copy()
         self.hit_rect.center = self.rect.center
-        self.pos = vec(x, y) * TILESIZE
+        self.pos = vec(x, y)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
         self.rect.center = self.pos
@@ -165,6 +165,7 @@ class Bullet(pygame.sprite.Sprite):
         self.game = game
         self.image = game.bullet_img
         self.rect = self.image.get_rect()
+        self.hit_rect = self.rect
         # Copies vector to another to avoid usin' player's pos
         self.pos = vec(pos)
         self.rect.center = pos
@@ -194,3 +195,16 @@ class Wall(pygame.sprite.Sprite):
         self.y = y
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
+        
+class Obstacle(pygame.sprite.Sprite):
+    def __init__(self, game, x, y, w, h):
+        # Member of all_sprites groups and walls groups
+        self.groups = game.walls
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = game.wall_img
+        self.rect = pygame.Rect(x, y, w, h)
+        self.x = x
+        self.y = y
+        self.rect.x = x
+        self.rect.y = y

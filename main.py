@@ -7,8 +7,8 @@ import sys
 import settings
 from settings import WIDTH, HEIGHT, TITLE, TILESIZE, FPS, PLAYER_IMG, WALL_IMG,\
 MOB_IMG, BULLET_IMG, BULLET_DAMAGE, MOB_DAMAGE, MOB_KNOCKBACK, GREEN, YELLOW,\
-RED, WHITE, PLAYER_HEALTH
-from sprites import Player, Wall, Mob, collide_hit_rect
+RED, WHITE, PLAYER_HEALTH, CYAN
+from sprites import Player, Wall, Mob, collide_hit_rect, Obstacle
 from os import path
 from tilemap import Camera, TiledMap
 vec = pygame.math.Vector2
@@ -91,8 +91,15 @@ class Game:
 #                    self.player = Player(self, col, row)
 #                elif tile == 'M':
 #                    Mob(self, col, row)
-        self.player = Player(self, 5, 5)
+        for tile_object in self.map.tmxdata.objects:
+            if tile_object.name == 'player':
+                self.player = Player(self, tile_object.x, tile_object.y)
+            if tile_object.name == 'zombie':
+                Mob(self, tile_object.x, tile_object.y)
+            if tile_object.name == 'wall':
+                Obstacle(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height)
         self.camera = Camera(self.map.width, self.map.height)
+        self.draw_debug = False
                     
 
     def run(self):
@@ -149,6 +156,12 @@ class Game:
                 sprite.draw_health()
             #self.screen.blit(sprite.image, sprite.rect)
             self.screen.blit(sprite.image, self.camera.apply(sprite))
+            if self.draw_debug:
+                pygame.draw.rect(self.screen, CYAN, self.camera.apply_rect(sprite.hit_rect), 1)
+        if self.draw_debug:
+            for wall in self.walls:
+                pygame.draw.rect(self.screen, CYAN, self.camera.apply_rect(wall.rect), 1)
+
         #used to draw rect showing additional helpful info
         #pygame.draw.rect(self.screen, settings.WHITE, self.player.hit_rect, 2)
         
@@ -162,6 +175,9 @@ class Game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_h:
+                    self.draw_debug = not self.draw_debug
 
     def show_start_screen(self):
         pass
