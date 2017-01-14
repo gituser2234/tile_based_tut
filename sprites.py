@@ -1,9 +1,10 @@
 import pygame
+import pytweening as tween
 from settings import TILESIZE, PLAYER_SPEED, PLAYER_ROT_SPEED, PLAYER_HIT_RECT,\
 MOB_SPEEDS, MOB_HIT_RECT, BULLET_SPEED, BULLET_LIFETIME, BULLET_RATE, BARREL_OFFSET,\
 KICKBACK, GUN_SPREAD, GREEN, YELLOW, RED, MOB_HEALTH, PLAYER_HEALTH, AVOID_RADIUS,\
 FLASH_DURATION, WALL_LAYER, PLAYER_LAYER, BULLET_LAYER, MOB_LAYER, EFFECTS_LAYER,\
-ITEMS_LAYER
+ITEMS_LAYER, BOB_RANGE, BOB_SPEED
 
 from tilemap import collide_hit_rect
 from random import uniform, choice, randint
@@ -264,5 +265,21 @@ class Item(pygame.sprite.Sprite):
         self.image = game.item_images[item_type]
         self.rect = self.image.get_rect()
         self.item_type = item_type
+        self.pos = pos
         self.rect.center = pos
+        # Choose tween function
+        self.tween = tween.easeInOutSine
+        # Store where we are, range: [0, 1]
+        self.step = 0
+        self.direction = 1
+        
+    def update(self):
+        # Bobbing motion
+        # - 0.5 because we start from the center
+        offset = BOB_RANGE * (self.tween(self.step / BOB_RANGE) - 0.5)
+        self.rect.centery = self.pos.y + offset * self.direction
+        self.step += BOB_SPEED
+        if self.step > BOB_RANGE:
+            self.step = 0
+            self.direction *= -1
         
