@@ -1,9 +1,10 @@
 import pygame
 from settings import TILESIZE, PLAYER_SPEED, PLAYER_ROT_SPEED, PLAYER_HIT_RECT,\
 MOB_SPEEDS, MOB_HIT_RECT, BULLET_SPEED, BULLET_LIFETIME, BULLET_RATE, BARREL_OFFSET,\
-KICKBACK, GUN_SPREAD, GREEN, YELLOW, RED, MOB_HEALTH, PLAYER_HEALTH, AVOID_RADIUS
+KICKBACK, GUN_SPREAD, GREEN, YELLOW, RED, MOB_HEALTH, PLAYER_HEALTH, AVOID_RADIUS,\
+FLASH_DURATION
 from tilemap import collide_hit_rect
-from random import uniform, choice
+from random import uniform, choice, randint
 vec = pygame.math.Vector2
 
 
@@ -83,6 +84,7 @@ class Player(pygame.sprite.Sprite):
                 pos = self.pos + BARREL_OFFSET.rotate(-self.rot)
                 Bullet(self.game, pos, direction)
                 self.vel = vec(-KICKBACK, 0).rotate(-self.rot)
+                MuzzleFlash(self.game, pos)
             
 #        # if running diagonal to avoid speed-up
 #        if self.vel.x != 0 and self.vel.y != 0:
@@ -223,3 +225,19 @@ class Obstacle(pygame.sprite.Sprite):
         self.y = y
         self.rect.x = x
         self.rect.y = y
+        
+class MuzzleFlash(pygame.sprite.Sprite):
+    def __init__(self, game, pos):
+        self.groups = game.all_sprites
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        size = randint(20, 50)
+        self.image = pygame.transform.scale(choice(game.gun_flashes), (size, size))
+        self.rect = self.image.get_rect()
+        self.pos = pos
+        self.rect.center = pos
+        self.spawn_time = pygame.time.get_ticks()
+        
+    def update(self):
+        if pygame.time.get_ticks() - self.spawn_time > FLASH_DURATION:
+            self.kill()

@@ -7,7 +7,7 @@ import sys
 import settings
 from settings import WIDTH, HEIGHT, TITLE, TILESIZE, FPS, PLAYER_IMG, WALL_IMG,\
 MOB_IMG, BULLET_IMG, BULLET_DAMAGE, MOB_DAMAGE, MOB_KNOCKBACK, GREEN, YELLOW,\
-RED, WHITE, PLAYER_HEALTH, CYAN
+RED, WHITE, PLAYER_HEALTH, CYAN, MUZZLE_FLASHES
 from sprites import Player, Mob, collide_hit_rect, Obstacle
 from os import path
 from tilemap import Camera, TiledMap
@@ -69,6 +69,9 @@ class Game:
         self.wall_img = pygame.image.load(path.join(img_folder, WALL_IMG)).convert_alpha()
         # Scale wall img due to its huge dimensions
         self.wall_img = pygame.transform.scale(self.wall_img, (TILESIZE, TILESIZE))
+        self.gun_flashes = []
+        for img in MUZZLE_FLASHES:
+            self.gun_flashes.append(pygame.image.load(path.join(img_folder, img)).convert_alpha())
 
     def new(self):
         # initialize all variables and do all the setup for a new game
