@@ -7,10 +7,13 @@ import sys
 import settings
 from settings import WIDTH, HEIGHT, TITLE, TILESIZE, FPS, PLAYER_IMG, WALL_IMG,\
 MOB_IMG, BULLET_IMG, BULLET_DAMAGE, MOB_DAMAGE, MOB_KNOCKBACK, GREEN, YELLOW,\
-RED, WHITE, PLAYER_HEALTH, CYAN, MUZZLE_FLASHES, ITEM_IMAGES, HEALTH_PACK_AMOUNT
+RED, WHITE, PLAYER_HEALTH, CYAN, MUZZLE_FLASHES, ITEM_IMAGES, HEALTH_PACK_AMOUNT,\
+BG_MUSIC, EFFECTS_SOUNDS, WEAPON_SOUNDS_GUN, ZOMBIE_MOAN_SOUNDS, PLAYER_HIT_SOUNDS,\
+ZOMBIE_HIT_SOUNDS
 from sprites import Player, Mob, collide_hit_rect, Obstacle, Item
 from os import path
 from tilemap import Camera, TiledMap
+from random import random, choice
 vec = pygame.math.Vector2
 
 # HUD FUNCTION
@@ -54,6 +57,8 @@ class Game:
         game_folder = path.dirname(__file__)
         img_folder = path.join(game_folder, 'img')
         map_folder = path.join(game_folder, 'maps')
+        snd_folder = path.join(game_folder, 'snd')
+        music_folder = path.join(game_folder, 'music')
 
         
         # Load data from map
@@ -77,6 +82,31 @@ class Game:
         self.item_images = {}
         for item in ITEM_IMAGES:
             self.item_images[item] = pygame.image.load(path.join(img_folder, ITEM_IMAGES[item])).convert_alpha()
+            
+        # Sound load
+        pygame.mixer.music.load(path.join(music_folder, BG_MUSIC))
+        self.effects_sounds = {}
+        for type in EFFECTS_SOUNDS:
+            self.effects_sounds[type] = pygame.mixer.Sound(path.join(snd_folder, EFFECTS_SOUNDS[type]))
+        
+        self.weapon_sounds = {}
+        self.weapon_sounds['gun'] = []
+        for snd in WEAPON_SOUNDS_GUN:
+            self.weapon_sounds['gun'].append(pygame.mixer.Sound(path.join(snd_folder, snd)))
+            
+        self.zombie_moan_sounds = []
+        for snd in ZOMBIE_MOAN_SOUNDS:
+            s = pygame.mixer.Sound(path.join(snd_folder, snd))
+            s.set_volume(0.2)
+            self.zombie_moan_sounds.append(s)
+            
+        self.player_hit_sounds = []
+        for snd in PLAYER_HIT_SOUNDS:
+            self.player_hit_sounds.append(pygame.mixer.Sound(path.join(snd_folder, snd)))
+            
+        self.zombie_hit_sounds = []
+        for snd in ZOMBIE_HIT_SOUNDS:
+            self.zombie_hit_sounds.append(pygame.mixer.Sound(path.join(snd_folder, snd)))
 
     def new(self):
         # initialize all variables and do all the setup for a new game
@@ -113,11 +143,15 @@ class Game:
                 Item(self, obj_center, tile_object.name)
         self.camera = Camera(self.map.width, self.map.height)
         self.draw_debug = False
+        self.effects_sounds['level_start'].play()
                     
 
     def run(self):
         # game loop - set self.playing = False to end the game
         self.playing = True
+        
+        # Loops=-1 means loop and repeat
+        pygame.mixer.music.play(loops=-1)
         
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
@@ -139,11 +173,14 @@ class Game:
         for hit in hits:
             if hit.item_type == 'health' and self.player.health < PLAYER_HEALTH:
                 hit.kill()
+                self.effects_sounds['health_up'].play()
                 self.player.add_health(HEALTH_PACK_AMOUNT)
         
         # Mobs hits playa'
         hits = pygame.sprite.spritecollide(self.player, self.mobs, False, collide_hit_rect)
         for hit in hits:
+            if random() < 0.7:
+                choice(self.player_hit_sounds).play()
             self.player.health -= MOB_DAMAGE
             hit.vel = vec(0, 0)
             if self.player.health <= 0:

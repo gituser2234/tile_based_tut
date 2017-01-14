@@ -4,10 +4,10 @@ from settings import TILESIZE, PLAYER_SPEED, PLAYER_ROT_SPEED, PLAYER_HIT_RECT,\
 MOB_SPEEDS, MOB_HIT_RECT, BULLET_SPEED, BULLET_LIFETIME, BULLET_RATE, BARREL_OFFSET,\
 KICKBACK, GUN_SPREAD, GREEN, YELLOW, RED, MOB_HEALTH, PLAYER_HEALTH, AVOID_RADIUS,\
 FLASH_DURATION, WALL_LAYER, PLAYER_LAYER, BULLET_LAYER, MOB_LAYER, EFFECTS_LAYER,\
-ITEMS_LAYER, BOB_RANGE, BOB_SPEED
+ITEMS_LAYER, BOB_RANGE, BOB_SPEED, DETECT_RADIUS
 
 from tilemap import collide_hit_rect
-from random import uniform, choice, randint
+from random import uniform, choice, randint, random
 vec = pygame.math.Vector2
 
 
@@ -83,6 +83,7 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE]:
             now = pygame.time.get_ticks()
             if now - self.last_shot > BULLET_RATE:
+                choice(self.game.weapon_sounds['gun']).play()
                 self.last_shot = now
                 direction = vec(1, 0).rotate(-self.rot)
                 # player's position + our's offset
@@ -127,7 +128,8 @@ class Mob(pygame.sprite.Sprite):
         self.groups = game.all_sprites, game.mobs
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = game.mob_img
+        # BUGFIX: @part18: using copy() to prevent from drawing buggy bars
+        self.image = game.mob_img.copy()
         self.rect = self.image.get_rect()
         # BUGFIX: @part15
         self.rect.center = (x, y)
@@ -140,6 +142,7 @@ class Mob(pygame.sprite.Sprite):
         self.rot = 0
         self.health = MOB_HEALTH
         self.speed = choice(MOB_SPEEDS)
+        self.target = game.player
         
     def avoid_mobs(self):
         for mob in self.game.mobs:
@@ -150,25 +153,33 @@ class Mob(pygame.sprite.Sprite):
                     self.acc += dist.normalize()
         
     def update(self):
-        # We calculate angle from mob to player's vectors
-        self.rot = (self.game.player.pos - self.pos).angle_to(vec(1, 0))
-        self.image = pygame.transform.rotate(self.game.mob_img, self.rot)
-        #self.rect = self.image.get_rect()
-        self.rect.center = self.pos
-        self.acc = vec(1, 0).rotate(-self.rot)
-        self.avoid_mobs()
-        self.acc.scale_to_length(self.speed)
-        # Now he has maximum speed
-        self.acc += self.vel * -1
-        self.vel += self.acc * self.game.dt
-        self.pos += self.vel * self.game.dt + 0.5 * self.acc * self.game.dt ** 2
-        self.hit_rect.centerx = self.pos.x
-        collide_with_walls(self, self.game.walls, 'x')
-        self.hit_rect.centery = self.pos.y
-        collide_with_walls(self, self.game.walls, 'y')
-        self.rect.center = self.hit_rect.center
+        target_dist = self.target.pos - self.pos
+        # Instead of comparing square root and radius
+        # We compare square and radius square
+        # Because it is much faster to compute
+        if target_dist.length_squared() < DETECT_RADIUS ** 2:
+            if random() < 0.002:
+                choice(self.game.zombie_moan_sounds).play()
+            # We calculate angle from mob to player's vectors
+            self.rot = target_dist.angle_to(vec(1, 0))
+            self.image = pygame.transform.rotate(self.game.mob_img, self.rot)
+            #self.rect = self.image.get_rect()
+            self.rect.center = self.pos
+            self.acc = vec(1, 0).rotate(-self.rot)
+            self.avoid_mobs()
+            self.acc.scale_to_length(self.speed)
+            # Now he has maximum speed
+            self.acc += self.vel * -1
+            self.vel += self.acc * self.game.dt
+            self.pos += self.vel * self.game.dt + 0.5 * self.acc * self.game.dt ** 2
+            self.hit_rect.centerx = self.pos.x
+            collide_with_walls(self, self.game.walls, 'x')
+            self.hit_rect.centery = self.pos.y
+            collide_with_walls(self, self.game.walls, 'y')
+            self.rect.center = self.hit_rect.center
         
         if self.health <= 0:
+            choice(self.game.zombie_hit_sounds).play()
             self.kill()
     
     def draw_health(self):
