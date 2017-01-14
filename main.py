@@ -10,7 +10,7 @@ MOB_IMG, BULLET_IMG, BULLET_DAMAGE, MOB_DAMAGE, MOB_KNOCKBACK, GREEN, YELLOW,\
 RED, WHITE, PLAYER_HEALTH
 from sprites import Player, Wall, Mob, collide_hit_rect
 from os import path
-from tilemap import Map, Camera
+from tilemap import Camera, TiledMap
 vec = pygame.math.Vector2
 
 # HUD FUNCTION
@@ -53,10 +53,14 @@ class Game:
         # Specify game folder
         game_folder = path.dirname(__file__)
         img_folder = path.join(game_folder, 'img')
+        map_folder = path.join(game_folder, 'maps')
+
         
         # Load data from map
         self.map_data = []
-        self.map = Map(path.join(game_folder, 'map3.txt'))
+        self.map = TiledMap(path.join(map_folder, 'level1.tmx'))
+        self.map_img = self.map.make_map()
+        self.map_rect = self.map_img.get_rect() 
         
         # Load img data
         self.player_img = pygame.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
@@ -78,16 +82,16 @@ class Game:
         # l = ['a', 'b', 'c', 'd']
         # for index, item in enumerate(l):
         #   print(index, item)
-        for row, tiles in enumerate(self.map.data):
-            for col, tile in enumerate(tiles):
-                if tile == '1':
-                    Wall(self, col, row)
-                elif tile == 'P':
-                    # Spawn player
-                    self.player = Player(self, col, row)
-                elif tile == 'M':
-                    Mob(self, col, row)
-                    
+#        for row, tiles in enumerate(self.map.data):
+#            for col, tile in enumerate(tiles):
+#                if tile == '1':
+#                    Wall(self, col, row)
+#                elif tile == 'P':
+#                    # Spawn player
+#                    self.player = Player(self, col, row)
+#                elif tile == 'M':
+#                    Mob(self, col, row)
+        self.player = Player(self, 5, 5)
         self.camera = Camera(self.map.width, self.map.height)
                     
 
@@ -136,7 +140,8 @@ class Game:
     def draw(self):
         # Display FPS
         pygame.display.set_caption("{:.2f}".format(self.clock.get_fps()))
-        self.screen.fill(settings.BGCOLOR)
+        #self.screen.fill(settings.BGCOLOR)
+        self.screen.blit(self.map_img, self.camera.apply_rect(self.map_rect))
         #self.draw_grid()
         for sprite in self.all_sprites:
             # If it is a Mob, then draw its health
