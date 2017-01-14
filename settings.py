@@ -57,3 +57,10 @@ AVOID_RADIUS = 50
 MUZZLE_FLASHES = ['whitePuff15.png', 'whitePuff16.png',
                   'whitePuff17.png', 'whitePuff18.png']  
 FLASH_DURATION = 40
+
+# LAYERS
+WALL_LAYER = 1
+PLAYER_LAYER = 2
+BULLET_LAYER = 3
+MOB_LAYER = 2
+EFFECTS_LAYER = 4

@@ -2,7 +2,8 @@ import pygame
 from settings import TILESIZE, PLAYER_SPEED, PLAYER_ROT_SPEED, PLAYER_HIT_RECT,\
 MOB_SPEEDS, MOB_HIT_RECT, BULLET_SPEED, BULLET_LIFETIME, BULLET_RATE, BARREL_OFFSET,\
 KICKBACK, GUN_SPREAD, GREEN, YELLOW, RED, MOB_HEALTH, PLAYER_HEALTH, AVOID_RADIUS,\
-FLASH_DURATION
+FLASH_DURATION, WALL_LAYER, PLAYER_LAYER, BULLET_LAYER, MOB_LAYER, EFFECTS_LAYER
+
 from tilemap import collide_hit_rect
 from random import uniform, choice, randint
 vec = pygame.math.Vector2
@@ -37,6 +38,8 @@ def collide_with_walls(sprite, group, direction):
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
+        # Setting layer before calling parental constructor
+        self._layer = PLAYER_LAYER
         self.groups = game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
@@ -112,6 +115,7 @@ class Player(pygame.sprite.Sprite):
         
 class Mob(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
+        self._layer = MOB_LAYER
         # Member of all_sprites groups and walls groups
         self.groups = game.all_sprites, game.mobs
         pygame.sprite.Sprite.__init__(self, self.groups)
@@ -177,6 +181,7 @@ class Mob(pygame.sprite.Sprite):
         
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, game, pos, direction):
+        self._layer = BULLET_LAYER
         self.groups = game.all_sprites, game.bullets
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
@@ -202,6 +207,7 @@ class Bullet(pygame.sprite.Sprite):
         
 class Wall(pygame.sprite.Sprite):
     def __init__(self, game, x, y):
+        self._layer = WALL_LAYER
         # Member of all_sprites groups and walls groups
         self.groups = game.all_sprites, game.walls
         pygame.sprite.Sprite.__init__(self, self.groups)
@@ -228,6 +234,7 @@ class Obstacle(pygame.sprite.Sprite):
         
 class MuzzleFlash(pygame.sprite.Sprite):
     def __init__(self, game, pos):
+        self._layer = EFFECTS_LAYER
         self.groups = game.all_sprites
         pygame.sprite.Sprite.__init__(self, self.groups)
         self.game = game
