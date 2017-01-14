@@ -2,7 +2,8 @@ import pygame
 from settings import TILESIZE, PLAYER_SPEED, PLAYER_ROT_SPEED, PLAYER_HIT_RECT,\
 MOB_SPEEDS, MOB_HIT_RECT, BULLET_SPEED, BULLET_LIFETIME, BULLET_RATE, BARREL_OFFSET,\
 KICKBACK, GUN_SPREAD, GREEN, YELLOW, RED, MOB_HEALTH, PLAYER_HEALTH, AVOID_RADIUS,\
-FLASH_DURATION, WALL_LAYER, PLAYER_LAYER, BULLET_LAYER, MOB_LAYER, EFFECTS_LAYER
+FLASH_DURATION, WALL_LAYER, PLAYER_LAYER, BULLET_LAYER, MOB_LAYER, EFFECTS_LAYER,\
+ITEMS_LAYER
 
 from tilemap import collide_hit_rect
 from random import uniform, choice, randint
@@ -111,6 +112,11 @@ class Player(pygame.sprite.Sprite):
         self.hit_rect.centery = self.pos.y
         collide_with_walls(self, self.game.walls, 'y')
         self.rect.center = self.hit_rect.center
+        
+    def add_health(self, amount):
+        self.health += amount
+        if self.health > PLAYER_HEALTH:
+            self.health = PLAYER_HEALTH
         
         
 class Mob(pygame.sprite.Sprite):
@@ -248,3 +254,15 @@ class MuzzleFlash(pygame.sprite.Sprite):
     def update(self):
         if pygame.time.get_ticks() - self.spawn_time > FLASH_DURATION:
             self.kill()
+            
+class Item(pygame.sprite.Sprite):
+    def __init__(self, game, pos, item_type):
+        self._layer = ITEMS_LAYER
+        self.groups = game.all_sprites, game.items
+        pygame.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = game.item_images[item_type]
+        self.rect = self.image.get_rect()
+        self.item_type = item_type
+        self.rect.center = pos
+        
